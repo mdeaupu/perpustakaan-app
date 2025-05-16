@@ -13,9 +13,9 @@ tpeminjaman
 - id eksemplar
 - tgl pinjam
 - tgl kembali (tconfig lama peminjaman, melebihi = denda)
-
+------------------------------------------------------------------------------------------------------------------------------
 id eksemplar harus dimulai dari 1 Ketika beda idbuku
 
-kode eksemplar Ketika ditambahkan harus dari akhir kode eksemplar
+kode eksemplar Ketika ditambahkan harus dari akhir kode eksemplar yang sudah ada
 
 Ketika ditambahakn jumlah, maka jumlah tmasterbuku ditambah bukan diubah
