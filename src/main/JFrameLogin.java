@@ -164,7 +164,7 @@ public class JFrameLogin extends javax.swing.JFrame {
             jText_username.requestFocus();
         }else{
             try{
-                String sql="select * from tanggota where Username='"+ jText_username.getText() +"' && Password='"+ jText_password.getText() +"'";
+                String sql="select * from tuser where Username='"+ jText_username.getText() +"' && Password='"+ jText_password.getText() +"'";
                 stm=con.createStatement();
                 rs=stm.executeQuery(sql);
                 if (rs.next()) {

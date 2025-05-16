@@ -16,37 +16,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `tanggota`
+-- Table structure for table `tconfig`
 --
 
-DROP TABLE IF EXISTS `tanggota`;
+DROP TABLE IF EXISTS `tconfig`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tanggota` (
-  `IdAnggota` varchar(10) NOT NULL,
-  `NamaAnggota` varchar(100) DEFAULT NULL,
-  `Alamat` text DEFAULT NULL,
-  `NoTelepon` varchar(15) DEFAULT NULL,
-  `Email` varchar(100) DEFAULT NULL,
-  `Username` varchar(50) DEFAULT NULL,
-  `Password` varchar(50) DEFAULT NULL,
-  `IdRole` int(11) DEFAULT NULL,
-  `DateCreate` datetime DEFAULT NULL,
-  `DateModify` datetime DEFAULT NULL,
-  PRIMARY KEY (`IdAnggota`),
-  KEY `IdRole` (`IdRole`),
-  CONSTRAINT `tanggota_ibfk_1` FOREIGN KEY (`IdRole`) REFERENCES `trole` (`IdRole`)
+CREATE TABLE `tconfig` (
+  `NamaPerpustakaan` int(11) DEFAULT NULL,
+  `Alamat` varchar(45) DEFAULT NULL,
+  `Denda` varchar(45) DEFAULT NULL,
+  `LamaPeminjaman` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tanggota`
+-- Dumping data for table `tconfig`
 --
 
-LOCK TABLES `tanggota` WRITE;
-/*!40000 ALTER TABLE `tanggota` DISABLE KEYS */;
-INSERT INTO `tanggota` VALUES ('AG001','John Doe','Jl. Contoh No. 123','081234567890','john.doe@example.com','johndoe','password123',1,'2023-10-26 10:00:00','2023-10-26 10:00:00'),('AG002','Doe John','Jl. Contoh No. 123','081234567890','john.doe@example.com','doejohn','password123',2,'2023-10-26 10:00:00','2023-10-26 10:00:00');
-/*!40000 ALTER TABLE `tanggota` ENABLE KEYS */;
+LOCK TABLES `tconfig` WRITE;
+/*!40000 ALTER TABLE `tconfig` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tconfig` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -179,7 +169,7 @@ CREATE TABLE `tpeminjaman` (
   `TanggalJatuhTempo` date DEFAULT NULL,
   PRIMARY KEY (`IdPeminjaman`),
   KEY `IdAnggota` (`IdAnggota`),
-  CONSTRAINT `tpeminjaman_ibfk_1` FOREIGN KEY (`IdAnggota`) REFERENCES `tanggota` (`IdAnggota`)
+  CONSTRAINT `tpeminjaman_ibfk_1` FOREIGN KEY (`IdAnggota`) REFERENCES `tuser` (`IdUser`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -271,6 +261,36 @@ LOCK TABLES `trole` WRITE;
 INSERT INTO `trole` VALUES (1,'admin','2025-05-02 19:15:10','2025-05-02 19:15:10'),(2,'mahasiswa','2025-05-02 20:39:42','2025-05-02 20:39:42');
 /*!40000 ALTER TABLE `trole` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `tuser`
+--
+
+DROP TABLE IF EXISTS `tuser`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tuser` (
+  `IdUser` varchar(10) NOT NULL,
+  `Username` varchar(50) DEFAULT NULL,
+  `Password` varchar(50) DEFAULT NULL,
+  `IdRole` int(11) DEFAULT NULL,
+  `DateCreate` datetime DEFAULT NULL,
+  `DateModify` datetime DEFAULT NULL,
+  PRIMARY KEY (`IdUser`),
+  KEY `IdRole` (`IdRole`),
+  CONSTRAINT `tuser_ibfk_1` FOREIGN KEY (`IdRole`) REFERENCES `trole` (`IdRole`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tuser`
+--
+
+LOCK TABLES `tuser` WRITE;
+/*!40000 ALTER TABLE `tuser` DISABLE KEYS */;
+INSERT INTO `tuser` VALUES ('ADM001','admin','admin',1,'2025-05-16 20:14:58','2025-05-16 20:14:58'),('PEG001','staff','staff',2,'2025-05-16 20:15:52','2025-05-16 20:15:52');
+/*!40000 ALTER TABLE `tuser` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -281,4 +301,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-16 19:55:05
+-- Dump completed on 2025-05-16 20:58:13
