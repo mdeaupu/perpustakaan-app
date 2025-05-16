@@ -4,6 +4,9 @@
  */
 package view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -95,7 +99,6 @@ tb.addColumn("Nama Buku");
 tb.addColumn("Pengarang"); 
 tb.addColumn("Penerbit"); 
 tb.addColumn("Jumlah");   
-tb.addColumn("Eksemplar");
 tb.addColumn("Date Create"); 
 tb.addColumn("Date Modify"); 
 tb.addColumn("Id Kategori"); 
@@ -105,7 +108,7 @@ tb.addColumn("Kode Eksemplar");
 jTableBukuView.setModel(tb); 
 try{ 
 // Mengambil data dari database
-  res=stat.executeQuery("SELECT b.IdEksemplar,b.KodeEksemplar,a.*,c.IdKategori,d.IdRak FROM tmasterbuku a JOIN teksemplar b ON a.IdBuku = b.IdBuku JOIN tkategori c ON a.IdKategori = c.IdKategori JOIN trak d ON a.IdRak = d.IdRak GROUP BY b.IdEksemplar, b.KodeEksemplar ORDER BY b.IdEksemplar ASC;"); 
+  res=stat.executeQuery("SELECT b.IdEksemplar,b.KodeEksemplar,a.*,c.IdKategori,d.IdRak FROM tmasterbuku a JOIN teksemplar b ON a.IdBuku = b.IdBuku JOIN tkategori c ON a.IdKategori = c.IdKategori JOIN trak d ON a.IdRak = d.IdRak GROUP BY b.IdEksemplar, b.KodeEksemplar ORDER BY SUBSTRING_INDEX(b.KodeEksemplar, '.', 1), CAST(SUBSTRING_INDEX(b.KodeEksemplar, '.', -1) AS UNSIGNED), b.IdEksemplar;"); 
         
  
         while (res.next()) 
@@ -118,7 +121,6 @@ try{
             res.getString("Pengarang"), 
             res.getString("Penerbit"), 
             res.getString("Jumlah"), 
-            res.getString("ConEksemplar"), 
             res.getString("DateCreate"), 
             res.getString("DateModify"),     
             res.getString("IdKategori"), 
@@ -158,46 +160,56 @@ try{
         column.setPreferredWidth(75); 
     } 
     
-    private void Caridata(String key) 
-  { 
-       DefaultTableModel tb= new DefaultTableModel(); 
-        // Memberi nama pada se�ap kolom tabel 
-        tb.addColumn("Id Buku"); 
-        tb.addColumn("Nama Buku"); 
-        tb.addColumn("Pengarang"); 
-        tb.addColumn("Penerbit"); 
-        tb.addColumn("Jumlah");   
-        tb.addColumn("Date Create"); 
-        tb.addColumn("Date Modify"); 
-        tb.addColumn("Id Kategori"); 
-        tb.addColumn("Id Rak"); 
+    private void Caridata(String key) {
+    try {
+        // Gunakan query yang sama dengan datatojtable tapi tambahkan filter pencarian
+        String sqlcek = "SELECT b.IdEksemplar,b.KodeEksemplar,a.*,c.IdKategori,d.IdRak " +
+                        "FROM tmasterbuku a " +
+                        "JOIN teksemplar b ON a.IdBuku = b.IdBuku " +
+                        "JOIN tkategori c ON a.IdKategori = c.IdKategori " +
+                        "JOIN trak d ON a.IdRak = d.IdRak " +
+                        "WHERE b.KodeEksemplar LIKE ? " +
+                        "GROUP BY b.IdEksemplar, b.KodeEksemplar " +
+                        "ORDER BY SUBSTRING_INDEX(b.KodeEksemplar, '.', 1), " +
+                        "CAST(SUBSTRING_INDEX(b.KodeEksemplar, '.', -1) AS UNSIGNED), b.IdEksemplar";
         
-        jTableBukuView.setModel(tb); 
-        try{ 
-        // Mengambil data dari database 
-         res=stat.executeQuery("SELECT b.IdEksemplar,b.KodeEksemplar,a.*,c.IdKategori,d.IdRak FROM tmasterbuku a JOIN teksemplar b ON a.IdBuku = b.IdBuku JOIN tkategori c ON a.IdKategori = c.IdKategori JOIN trak d ON a.IdRak = d.IdRak GROUP BY b.IdEksemplar, b.KodeEksemplar ORDER BY b.IdEksemplar ASC;"); 
+        PreparedStatement pstmt = con.prepareStatement(sqlcek);
+        pstmt.setString(1, "%" + key + "%");
         
- 
-        while (res.next()) 
-        { 
-        // Mengambil data dari database berdasarkan nama kolom pada tabel 
-            // Lalu di tampilkan ke dalam JTable 
-            tb.addRow(new Object[]{ 
-            res.getString("IdBuku"), 
-            res.getString("NamaBuku"), 
-            res.getString("Pengarang"), 
-            res.getString("Penerbit"), 
-            res.getString("Jumlah"), 
-            res.getString("DateCreate"), 
-            res.getString("DateModify"),     
-            res.getString("IdKategori"), 
-            res.getString("IdRak") 
-           }); 
-          } 
-            Aturkolom(); //pemanggilan class untuk mengatur kolom 
-        }catch (SQLException e){ 
-        } 
-  }
+        ResultSet rs = pstmt.executeQuery();
+        
+        DefaultTableModel model = (DefaultTableModel) jTableBukuView.getModel();
+        model.setRowCount(0);
+        
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getString("IdBuku"), 
+                rs.getString("NamaBuku"), 
+                rs.getString("Pengarang"), 
+                rs.getString("Penerbit"), 
+                rs.getString("Jumlah"), 
+                rs.getString("DateCreate"), 
+                rs.getString("DateModify"),     
+                rs.getString("IdKategori"), 
+                rs.getString("IdRak"),
+                rs.getString("IdEksemplar"), 
+                rs.getString("KodeEksemplar")
+            });
+        }
+        
+        if (model.getRowCount() > 0) {
+            jTableBukuView.setRowSelectionInterval(0, 0);
+            jTableBukuView.scrollRectToVisible(jTableBukuView.getCellRect(0, 0, true));
+        }
+        
+        rs.close();
+        pstmt.close();
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -216,6 +228,20 @@ try{
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("VIEW BUKU");
+
+        jTextNamaBuku.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextNamaBukuActionPerformed(evt);
+            }
+        });
+        jTextNamaBuku.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextNamaBukuKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextNamaBukuKeyReleased(evt);
+            }
+        });
 
         jLabel2.setText("NAMA BUKU");
 
@@ -261,6 +287,34 @@ try{
                 .addContainerGap(241, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextNamaBukuKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextNamaBukuKeyPressed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jTextNamaBukuKeyPressed
+
+    private void jTextNamaBukuKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextNamaBukuKeyReleased
+        // TODO add your handling code here:
+            Timer timer = new Timer(300, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String searchText = jTextNamaBuku.getText().trim();
+            if (searchText.length() >= 1) { // Minimal 1 karakter untuk pencarian
+                Caridata(searchText);
+            } else {
+                // Jika field kosong, kosongkan tabel atau tampilkan semua data
+                DefaultTableModel model = (DefaultTableModel) jTableBukuView.getModel();
+                model.setRowCount(0);
+            }
+        }
+    });
+    timer.setRepeats(false);
+    timer.start();
+    }//GEN-LAST:event_jTextNamaBukuKeyReleased
+
+    private void jTextNamaBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextNamaBukuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextNamaBukuActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

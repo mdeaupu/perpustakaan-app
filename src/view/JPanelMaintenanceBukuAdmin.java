@@ -261,117 +261,122 @@ public void dataToComboBoxRak() {
        jTextIdBuku.requestFocus(); 
    }
      
-    private void insEksemplar() {
-    try {
-        String jml = jTextJumlah.getText();
-        String idBuku = jTextIdBuku.getText();
-        Integer xjml = Integer.parseInt(jml);
-
-        for (int i = 1; i <= xjml; i++) {
-            String kodeEks = idBuku + "." + i;
-            Statement stmt = con.createStatement();
-            
-            String sql = "INSERT INTO teksemplar (IdBuku, KodeEksemplar, DateCreate, DateModify) " +
-                         "VALUES ('" + idBuku + "', '" + kodeEks + "', NOW(), NOW())";
-            
-            stmt.executeUpdate(sql);
-            stmt.close();
+    private void insEksemplar(String idBuku, int jumlah) throws SQLException {
+    // Cari nomor terakhir untuk IdBuku ini
+    String findLastNumQuery = "SELECT MAX(IdEksemplar) as last_num FROM teksemplar WHERE IdBuku = ?";
+    int startNumber = 1;
+    
+    try (PreparedStatement findStmt = con.prepareStatement(findLastNumQuery)) {
+        findStmt.setString(1, idBuku);
+        ResultSet rs = findStmt.executeQuery();
+        
+        if (rs.next() && rs.getObject("last_num") != null) {
+            startNumber = rs.getInt("last_num") + 1;
         }
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+    }
+
+    // Insert data baru
+    String insertQuery = "INSERT INTO teksemplar (IdEksemplar, IdBuku, KodeEksemplar, DateCreate, DateModify) " +
+                       "VALUES (?, ?, ?, NOW(), NOW())";
+    
+    try (PreparedStatement stmt = con.prepareStatement(insertQuery)) {
+        for (int i = 0; i < jumlah; i++) {
+            int currentId = startNumber + i;
+            String kodeEks = idBuku + "." + currentId;
+            
+            stmt.setInt(1, currentId);
+            stmt.setString(2, idBuku);
+            stmt.setString(3, kodeEks);
+            stmt.executeUpdate();
+        }
     }
 }
      
-     private void updEksemplar() {
-    // Deklarasi tanggal saat ini
-    java.util.Date tanggal = new java.util.Date();
-    java.text.SimpleDateFormat setTanggal = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    String TglNow = setTanggal.format(tanggal);
+     private void updEksemplar(String idBuku, int xjml, String TglNow) throws SQLException {
+         String namaKategori = jComboKategori.getSelectedItem().toString();
+    String idKategori = kategoriMap.get(namaKategori);
+    String namaRak = jComboRak.getSelectedItem().toString();
+    String idRak = rakMap.get(namaRak);
+    int response = JOptionPane.showConfirmDialog(null, 
+        "Apakah Data Stok Akan di Tambah [Ya] atau Ubah Stok [Tidak]?",
+        "Informasi",
+        JOptionPane.YES_NO_OPTION);
     
-    try {
-        String idBuku = jTextIdBuku.getText(); 
-        String jml = jTextJumlah.getText();
-
-        if(idBuku.isEmpty() || jml.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "ID Buku dan Jumlah tidak boleh kosong");
-            return;
-        }
-        
-        int xjml = Integer.parseInt(jml);
-        int response = JOptionPane.showConfirmDialog(null, 
-            "Apakah Data Stok Akan di Tambah [Ya] atau Ubah Stok [Tidak]?",
-            "Informasi",
-            JOptionPane.YES_NO_OPTION);
-        
-        if(response == JOptionPane.YES_OPTION) {
-            try {
-                Statement getStmt = con.createStatement();
-                ResultSet rs = getStmt.executeQuery("SELECT ConEksemplar FROM tmasterbuku WHERE IdBuku='" + idBuku + "'");
-                rs.next();
-                int currentCount = rs.getInt("ConEksemplar");
+    Statement findStmt = con.createStatement();
+    ResultSet res = findStmt.executeQuery(
+        "SELECT MAX(CAST(SUBSTRING_INDEX(KodeEksemplar, '.', -1) AS UNSIGNED)) as last_num " +
+        "FROM teksemplar WHERE IdBuku='" + idBuku + "'");
+    
+    int startNumber = 1; // Default jika belum ada eksemplar
+    if (res.next() && res.getObject("last_num") != null) {
+        startNumber = res.getInt("last_num");
+    }
+    findStmt.close();
+    
+    if (response == JOptionPane.YES_OPTION) {
+        // Tambah stok
+        // Dapatkan jumlah saat ini
+            Statement getStmt = con.createStatement();
+            ResultSet rs = getStmt.executeQuery("SELECT Jumlah FROM tmasterbuku WHERE IdBuku='" + idBuku + "'");
+            
+            if (!rs.next()) {
+                JOptionPane.showMessageDialog(null, "Buku dengan ID " + idBuku + " tidak ditemukan");
                 getStmt.close();
-                
-                int newCount = currentCount + xjml;
-                int startIndex = currentCount + 1;
-                
-                for(int i = startIndex; i <= newCount; i++) {
-                    String kodeEks = idBuku + "." + i;
-                    Statement stmt = con.createStatement();
-                    String sql = "INSERT INTO teksemplar (IdBuku, KodeEksemplar, DateCreate, DateModify) " +
-                                "VALUES ('" + idBuku + "', '" + kodeEks + "', '" + TglNow + "', '" + TglNow + "')";
-                    stmt.executeUpdate(sql);
-                    stmt.close();
-                }
-                
-                String updateSql = "UPDATE tmasterbuku SET Jumlah=Jumlah + " + xjml + 
-                                  ", ConEksemplar=" + newCount + 
-                                  ", DateModify='" + TglNow + "'" +
-                                  " WHERE IdBuku='" + idBuku + "'";
-                Statement updateStmt = con.createStatement();
-                updateStmt.executeUpdate(updateSql);
-                updateStmt.close();
-                
-            } catch(SQLException e) {
-                JOptionPane.showMessageDialog(null, "Gagal menambah stok: " + e.getMessage());
-                e.printStackTrace();
+                return;
             }
             
-        } else if(response == JOptionPane.NO_OPTION) {
-            try {
-                Statement delStmt = con.createStatement();
-                delStmt.executeUpdate("DELETE FROM teksemplar WHERE IdBuku='" + idBuku + "'");
-                delStmt.close();
-                
-                for(int i = 1; i <= xjml; i++) {
-                    String kodeEks = idBuku + "." + i;
-                    Statement insStmt = con.createStatement();
-                    String sql = "INSERT INTO teksemplar (IdBuku, KodeEksemplar, DateCreate, DateModify) " +
-                                "VALUES ('" + idBuku + "', '" + kodeEks + "', '" + TglNow + "', '" + TglNow + "')";
-                    insStmt.executeUpdate(sql);
-                    insStmt.close();
-                }
-                
-                String updateSql = "UPDATE tmasterbuku SET Jumlah=" + xjml + 
-                                  ", ConEksemplar=" + xjml + 
-                                  ", DateModify='" + TglNow + "'" +
-                                  " WHERE IdBuku='" + idBuku + "'";
-                Statement updateStmt = con.createStatement();
-                updateStmt.executeUpdate(updateSql);
-                updateStmt.close();
-                
-            } catch(SQLException e) {
-                JOptionPane.showMessageDialog(null, "Gagal mengubah stok: " + e.getMessage());
-                e.printStackTrace();
-            }
+            int currentJumlah = rs.getInt("Jumlah");
+        try {
+            // Tambahkan eksemplar baru
+            insEksemplar(idBuku, xjml);
+            
+            // Update jumlah di tmasterbuku
+            Statement updateStmt = con.createStatement();
+            updateStmt.executeUpdate("UPDATE tmasterbuku SET " +
+                                   "Jumlah = " + (currentJumlah + xjml) + ", " +
+                                   "DateModify = '" + TglNow + "' " +
+                                   "WHERE IdBuku = '" + idBuku + "'");
+            updateStmt.close();
+            
+            JOptionPane.showMessageDialog(null, "Berhasil menambahkan " + xjml + " eksemplar. " +
+                                      "Stok sekarang: " + (currentJumlah + xjml));
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Gagal menambah stok: " + e.getMessage());
+            e.printStackTrace();
         }
-        
-    } catch(NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, "Jumlah harus berupa angka");
-    } catch(Exception e) {
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-        e.printStackTrace();
+    } else if (response == JOptionPane.NO_OPTION) {
+        // Ubah stok
+        try {
+            // Hapus semua eksemplar lama
+            Statement delStmt = con.createStatement();
+            delStmt.executeUpdate("DELETE FROM teksemplar WHERE IdBuku='" + idBuku + "'");
+            delStmt.close();
+            
+            // Tambahkan eksemplar baru
+            insEksemplar(idBuku, xjml);
+            
+            // Update jumlah di tmasterbuku
+            Statement updateStmt = con.createStatement();
+            updateStmt.executeUpdate("UPDATE tmasterbuku SET " +
+                "NamaBuku='" + jTextNamaBuku.getText() + "', " +
+                "Pengarang='" + jTextPengarang.getText() + "', " +
+                "Penerbit='" + jTextPenerbit.getText() + "', " +
+                "Jumlah=" + xjml + ", " +
+                "IdKategori='" + idKategori + "', " +
+                "IdRak='" + idRak + "', " +
+                "DateModify='" + TglNow + "' " +
+                "WHERE IdBuku='" + idBuku + "'");
+            updateStmt.close();
+            
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Gagal mengubah stok: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
+
      
     /**
      * This method is called from within the constructor to initialize the form.
@@ -622,7 +627,7 @@ public void dataToComboBoxRak() {
                 }
 
                 try (Statement stmtUpdate = con.createStatement()) {
-                    stmtUpdate.executeUpdate("UPDATE tmasterbuku SET Jumlah = Jumlah - 1, ConEksemplar = ConEksemplar - 1 WHERE IdBuku='" + jTextIdBuku.getText() + "'");
+                    stmtUpdate.executeUpdate("UPDATE tmasterbuku SET Jumlah = Jumlah - 1 WHERE IdBuku='" + jTextIdBuku.getText() + "'");
                 }
 
                 try (Statement stmtCount = con.createStatement();
@@ -661,97 +666,61 @@ public void dataToComboBoxRak() {
 
     private void jButtonSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSimpanActionPerformed
         // TODO add your handling code here:
-        JFrameHome home = new JFrameHome();
          java.util.Date tanggal = new java.util.Date();
     java.text.SimpleDateFormat setTanggal = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String TglNow = setTanggal.format(tanggal);
+    
+    String idBuku = jTextIdBuku.getText();
+    String namaBuku = jTextNamaBuku.getText();
+    String jumlahText = jTextJumlah.getText();
     String namaKategori = jComboKategori.getSelectedItem().toString();
-    String idKategori = kategoriMap.get(namaKategori); // Ambil ID dari Map
+    String idKategori = kategoriMap.get(namaKategori);
     String namaRak = jComboRak.getSelectedItem().toString();
-    String idRak = rakMap.get(namaRak); // Ambil ID dari Map
-    // Validate input fields
-    if (jTextIdBuku.getText().isEmpty() || jTextNamaBuku.getText().isEmpty() || jTextJumlah.getText().isEmpty()) {
+    String idRak = rakMap.get(namaRak);
+    
+    // Validasi input
+    if (idBuku.isEmpty() || namaBuku.isEmpty() || jumlahText.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Semua Kolom harus diisi");
         jTextIdBuku.requestFocus();
         return;
     }
     
-    Statement stat = null;
-    ResultSet res = null;
-    
     try {
-
-        String sqlCheck = "SELECT * FROM tmasterbuku WHERE IdBuku='" + jTextIdBuku.getText() + "'";
-        stat = con.createStatement();
-        res = stat.executeQuery(sqlCheck);
+        int xjml = Integer.parseInt(jumlahText);
+        if (xjml < 0) {
+            JOptionPane.showMessageDialog(null, "Jumlah harus lebih besar atau sama dengan nol");
+            jTextJumlah.requestFocus();
+            return;
+        }
         
-        if (res.next()) {
-            String jml = jTextJumlah.getText();
-            int currentConEks = res.getInt("ConEksemplar");
-            int xjml = Integer.parseInt(jml);
-            
-            if (xjml < 0) {
-                JOptionPane.showMessageDialog(null, "Jumlah harus lebih besar atau sama dengan nol");
-                jTextJumlah.requestFocus();
-                return;
-            }
-            
-            String sqlUpdate = "UPDATE tmasterbuku SET "
-                + "NamaBuku='" + jTextNamaBuku.getText() + "', "
-                + "Pengarang='" + jTextPengarang.getText() + "', "
-                + "Penerbit='" + jTextPenerbit.getText() + "', "
-                + "Jumlah='" + xjml + "', "
-                + "ConEksemplar='" + xjml + "', "
-                + "IdKategori='" + idKategori + "', "
-                + "IdRak='" + idRak + "', "
-                + "DateModify='" + TglNow + "' "
-                + "WHERE IdBuku='" + jTextIdBuku.getText() + "'";
-            
-            try (Statement stmt = con.createStatement()) {
-                stmt.executeUpdate(sqlUpdate);
-            }
-            
-            updEksemplar();
-            
-            JOptionPane.showMessageDialog(null, "Data buku berhasil diupdate", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            datatojtable();
-            Bersihkan();
-            
+        Statement checkStmt = con.createStatement();
+        ResultSet rs = checkStmt.executeQuery("SELECT * FROM tmasterbuku WHERE IdBuku='" + idBuku + "'");
+        boolean isUpdate = rs.next();
+        checkStmt.close();
+        
+        if (isUpdate) {
+            updEksemplar(idBuku, xjml, TglNow);
         } else {
-            String sqlInsert = "INSERT INTO tmasterbuku (IdBuku, NamaBuku, Pengarang, Penerbit, Jumlah, ConEksemplar, DateCreate, DateModify, IdKategori, IdRak) "
-                + "VALUES ('" + jTextIdBuku.getText() + "', "
-                + "'" + jTextNamaBuku.getText() + "', "
-                + "'" + jTextPengarang.getText() + "', "
-                + "'" + jTextPenerbit.getText() + "', "
-                + jTextJumlah.getText() + ", "
-                + jTextJumlah.getText() + ", " 
-                + "'" + TglNow + "', "
-                + "'" + TglNow + "', "
-                + "'" + idKategori + "', "
-                + "'" + idRak + "')";
+            // Insert data baru
+            Statement insertStmt = con.createStatement();
+            insertStmt.executeUpdate("INSERT INTO tmasterbuku (IdBuku, NamaBuku, Pengarang, Penerbit, Jumlah,  " +
+                                   "DateCreate, DateModify, IdKategori, IdRak) VALUES ('" + idBuku + "', '" + 
+                                   namaBuku + "', '" + jTextPengarang.getText() + "', '" + jTextPenerbit.getText() + "', " +
+                                   xjml + ", '" + TglNow + "', '" + TglNow + "', '" + 
+                                   idKategori + "', '" + idRak + "')");
+            insertStmt.close();
             
-            try (Statement stmt = con.createStatement()) {
-                stmt.executeUpdate(sqlInsert);
-            }
-            
-            insEksemplar();
-            
-            JOptionPane.showMessageDialog(null, "Data buku berhasil ditambahkan", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            datatojtable();
-            Bersihkan();
+            insEksemplar(idBuku, xjml);
         }
         
-    } catch(SQLException err) {
-        JOptionPane.showMessageDialog(this, "Error database: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } catch(NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Data buku berhasil " + (isUpdate ? "diupdate" : "ditambahkan"), 
+            "Sukses", JOptionPane.INFORMATION_MESSAGE);
+        datatojtable();
+        Bersihkan();
+    } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(null, "Jumlah harus berupa angka", "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (res != null) res.close();
-            if (stat != null) stat.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    } catch (SQLException err) {
+        JOptionPane.showMessageDialog(this, "Error database: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
     triggerUpdate();
     }//GEN-LAST:event_jButtonSimpanActionPerformed
