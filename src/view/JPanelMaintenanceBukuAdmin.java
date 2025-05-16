@@ -220,7 +220,7 @@ public void dataToComboBoxRak() {
     private void cekdatabrg() 
     { 
       try{ 
-         String sqlcek="select * from tmasterbuku where IdBuku='"+ jTextIdBuku.getText() +"'";
+         String sqlcek="SELECT b.*,r.NamaRak AS NamaRak,k.NamaKategori AS NamaKategori FROM tmasterbuku b INNER JOIN trak r ON b.IdRak = r.IdRak INNER JOIN tkategori k ON b.IdKategori = k.IdKategori WHERE b.IdBuku = '"+jTextIdBuku.getText()+"'";
             ResultSet rscek=stat.executeQuery(sqlcek); 
                   if (rscek.next()) 
                       
@@ -231,8 +231,8 @@ public void dataToComboBoxRak() {
              jTextPengarang.setText(rscek.getString("Pengarang"));
              jTextPenerbit.setText(rscek.getString("Penerbit"));
              jTextJumlah.setText(rscek.getString("Jumlah"));
-             jComboKategori.setSelectedItem(rscek.getString("IdKategori"));    
-             jComboRak.setSelectedItem(rscek.getString("IdRak"));    
+             jComboKategori.setSelectedItem(rscek.getString("NamaKategori"));    
+             jComboRak.setSelectedItem(rscek.getString("NamaRak"));    
              jTextIdBuku.requestFocus(); 
          }else{ 
               JOptionPane.showMessageDialog(null, "Buku tidak Ditemukan!, anda bisa memasukan datanya");
