@@ -46,22 +46,21 @@ public class JFrameRoleUser extends javax.swing.JFrame {
     public void DataToTable() {
         model.getDataVector().removeAllElements();
         model.fireTableDataChanged();
-         try {
-             Statement stat=(Statement)koneksi.GetKoneksi().createStatement();
-             String sql=" select * from trole";
-             ResultSet rs =stat.executeQuery(sql);
-             
-             while(rs.next()) {
-                 Object[] fieldx=new Object[4];
-                 fieldx[0]=rs.getString("IdRole");
-                 fieldx[1]=rs.getString("NamaRole");
-                 fieldx[2]=rs.getString("DateCreate");
-                 fieldx[3]=rs.getString("DateModify");
-                 model.addRow(fieldx);
-             }
-         } catch (SQLException e) {
-             JOptionPane.showMessageDialog(null, e.getMessage());
-         }
+        try {
+            Statement stat=(Statement)koneksi.GetKoneksi().createStatement();
+            String sql=" select * from trole";
+            ResultSet rs =stat.executeQuery(sql);
+            while(rs.next()) {
+                Object[] fieldx=new Object[4];
+                fieldx[0]=rs.getString("IdRole");
+                fieldx[1]=rs.getString("NamaRole");
+                fieldx[2]=rs.getString("DateCreate");
+                fieldx[3]=rs.getString("DateModify");
+                model.addRow(fieldx);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
     }
     
     private void bersihkantextfiled() { 

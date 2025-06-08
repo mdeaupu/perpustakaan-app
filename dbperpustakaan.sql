@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.41, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: dbperpustakaan
 -- ------------------------------------------------------
@@ -16,54 +16,36 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `tconfig`
+-- Table structure for table `tanggota`
 --
 
-DROP TABLE IF EXISTS `tconfig`;
+DROP TABLE IF EXISTS `tanggota`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tconfig` (
-  `NamaPerpustakaan` int(11) DEFAULT NULL,
-  `Alamat` varchar(45) DEFAULT NULL,
-  `Denda` varchar(45) DEFAULT NULL,
-  `LamaPeminjaman` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE `tanggota` (
+  `IdAnggota` varchar(10) NOT NULL,
+  `Nim` varchar(45) DEFAULT NULL,
+  `Nama` varchar(45) DEFAULT NULL,
+  `Prodi` varchar(45) DEFAULT NULL,
+  `Semester` int(11) DEFAULT NULL,
+  `NoTelepon` varchar(45) DEFAULT NULL,
+  `Email` varchar(45) DEFAULT NULL,
+  `Alamat` text DEFAULT NULL,
+  `DateCreate` datetime DEFAULT NULL,
+  `DateModify` datetime DEFAULT NULL,
+  PRIMARY KEY (`IdAnggota`),
+  UNIQUE KEY `Nim_UNIQUE` (`Nim`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tconfig`
+-- Dumping data for table `tanggota`
 --
 
-LOCK TABLES `tconfig` WRITE;
-/*!40000 ALTER TABLE `tconfig` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tconfig` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `tdetailpeminjaman`
---
-
-DROP TABLE IF EXISTS `tdetailpeminjaman`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tdetailpeminjaman` (
-  `IdDetailPeminjaman` varchar(10) NOT NULL,
-  `IdPeminjaman` varchar(10) DEFAULT NULL,
-  `IdEksemplar` int(11) DEFAULT NULL,
-  PRIMARY KEY (`IdDetailPeminjaman`),
-  KEY `IdPeminjaman` (`IdPeminjaman`),
-  KEY `IdEksemplar` (`IdEksemplar`),
-  CONSTRAINT `tdetailpeminjaman_ibfk_1` FOREIGN KEY (`IdPeminjaman`) REFERENCES `tpeminjaman` (`IdPeminjaman`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tdetailpeminjaman`
---
-
-LOCK TABLES `tdetailpeminjaman` WRITE;
-/*!40000 ALTER TABLE `tdetailpeminjaman` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tdetailpeminjaman` ENABLE KEYS */;
+LOCK TABLES `tanggota` WRITE;
+/*!40000 ALTER TABLE `tanggota` DISABLE KEYS */;
+INSERT INTO `tanggota` VALUES ('AGT001','202301001','Budi Santoso','Teknik Informatika',3,'08123456789','budi@email.com','Jl. Merdeka No. 10','2025-05-30 15:36:44','2025-05-30 15:36:44'),('AGT002','202302045','Ani Rahmawati','Manajemen',5,'08129876543','ani@email.com','Jl. Sudirman No. 5','2025-05-30 15:36:44','2025-05-30 15:36:44'),('AGT003','202303123','Citra Dewi','Akuntansi',7,'08561234567','citra@email.com','Jl. Gatot Subroto No. 15','2025-05-30 15:36:44','2025-05-30 15:36:44');
+/*!40000 ALTER TABLE `tanggota` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -74,14 +56,14 @@ DROP TABLE IF EXISTS `teksemplar`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `teksemplar` (
-  `IdEksemplar` int(11) NOT NULL,
+  `IdEksemplar` int(11) DEFAULT NULL,
   `IdBuku` varchar(10) DEFAULT NULL,
   `KodeEksemplar` varchar(20) NOT NULL,
   `DateCreate` datetime DEFAULT NULL,
   `DateModify` datetime DEFAULT NULL,
-  PRIMARY KEY (`KodeEksemplar`),
-  KEY `IdBuku` (`IdBuku`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `Status` enum('true','false') DEFAULT NULL,
+  PRIMARY KEY (`KodeEksemplar`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +72,7 @@ CREATE TABLE `teksemplar` (
 
 LOCK TABLES `teksemplar` WRITE;
 /*!40000 ALTER TABLE `teksemplar` DISABLE KEYS */;
-INSERT INTO `teksemplar` VALUES (1,'BUK001','BUK001.1','2025-05-16 18:38:43','2025-05-16 18:38:43'),(10,'BUK001','BUK001.10','2025-05-16 18:38:43','2025-05-16 18:38:43'),(11,'BUK001','BUK001.11','2025-05-16 18:45:13','2025-05-16 18:45:13'),(12,'BUK001','BUK001.12','2025-05-16 18:45:13','2025-05-16 18:45:13'),(13,'BUK001','BUK001.13','2025-05-16 19:17:00','2025-05-16 19:17:00'),(2,'BUK001','BUK001.2','2025-05-16 18:38:43','2025-05-16 18:38:43'),(3,'BUK001','BUK001.3','2025-05-16 18:38:43','2025-05-16 18:38:43'),(4,'BUK001','BUK001.4','2025-05-16 18:38:43','2025-05-16 18:38:43'),(5,'BUK001','BUK001.5','2025-05-16 18:38:43','2025-05-16 18:38:43'),(6,'BUK001','BUK001.6','2025-05-16 18:38:43','2025-05-16 18:38:43'),(8,'BUK001','BUK001.8','2025-05-16 18:38:43','2025-05-16 18:38:43'),(9,'BUK001','BUK001.9','2025-05-16 18:38:43','2025-05-16 18:38:43'),(1,'BUK002','BUK002.1','2025-05-16 18:38:55','2025-05-16 18:38:55'),(2,'BUK002','BUK002.2','2025-05-16 18:38:55','2025-05-16 18:38:55'),(3,'BUK002','BUK002.3','2025-05-16 18:38:55','2025-05-16 18:38:55'),(4,'BUK002','BUK002.4','2025-05-16 18:38:55','2025-05-16 18:38:55'),(5,'BUK002','BUK002.5','2025-05-16 18:38:55','2025-05-16 18:38:55');
+INSERT INTO `teksemplar` VALUES (1,'BUK001','BUK001.1','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(10,'BUK001','BUK001.10','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(11,'BUK001','BUK001.11','2025-05-30 17:49:39','2025-05-30 17:49:39','false'),(12,'BUK001','BUK001.12','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(2,'BUK001','BUK001.2','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(3,'BUK001','BUK001.3','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(4,'BUK001','BUK001.4','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(5,'BUK001','BUK001.5','2025-05-30 17:49:39','2025-05-30 17:49:39','false'),(6,'BUK001','BUK001.6','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(7,'BUK001','BUK001.7','2025-05-30 17:49:39','2025-05-30 17:49:39','true'),(8,'BUK001','BUK001.8','2025-05-30 17:49:39','2025-05-30 17:49:39','false'),(9,'BUK001','BUK001.9','2025-05-30 17:49:39','2025-05-30 17:49:39','false'),(1,'BUK002','BUK002.1','2025-05-30 17:50:01','2025-05-30 17:50:01','false'),(2,'BUK002','BUK002.2','2025-05-30 17:50:01','2025-05-30 17:50:01','true'),(3,'BUK002','BUK002.3','2025-05-30 17:50:01','2025-05-30 17:50:01','false'),(4,'BUK002','BUK002.4','2025-05-30 17:50:01','2025-05-30 17:50:01','true'),(5,'BUK002','BUK002.5','2025-05-30 17:50:01','2025-05-30 17:50:01','true');
 /*!40000 ALTER TABLE `teksemplar` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,11 +85,11 @@ DROP TABLE IF EXISTS `tkategori`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tkategori` (
   `IdKategori` varchar(10) NOT NULL,
-  `NamaKategori` varchar(100) NOT NULL,
+  `NamaKategori` varchar(100) DEFAULT NULL,
   `DateCreate` datetime DEFAULT NULL,
   `DateModify` datetime DEFAULT NULL,
   PRIMARY KEY (`IdKategori`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +98,7 @@ CREATE TABLE `tkategori` (
 
 LOCK TABLES `tkategori` WRITE;
 /*!40000 ALTER TABLE `tkategori` DISABLE KEYS */;
-INSERT INTO `tkategori` VALUES ('KTG002','Sains','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG003','Sejarah','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG004','Fiksi','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG005','Bisnis','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG006','Kesehatan','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG007','Seni & Desain','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG008','Pendidikan','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG009','Agama','2025-05-09 23:57:57','2025-05-09 23:57:57'),('KTG010','Hukum','2025-05-09 23:57:57','2025-05-09 23:57:57');
+INSERT INTO `tkategori` VALUES ('KTG001','Teknologi Informasi','2025-05-30 15:39:18','2025-05-30 15:39:18'),('KTG002','Manajemen Bisnis','2025-05-30 15:39:18','2025-05-30 15:39:18'),('KTG003','Sastra','2025-05-30 15:39:18','2025-05-30 15:39:18'),('KTG004','Ilmu Pengetahuan Alam','2025-05-30 15:39:18','2025-05-30 15:39:18');
 /*!40000 ALTER TABLE `tkategori` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -138,11 +120,9 @@ CREATE TABLE `tmasterbuku` (
   `IdKategori` varchar(10) DEFAULT NULL,
   `IdRak` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`IdBuku`),
-  KEY `IdKategori` (`IdKategori`),
-  KEY `IdRak` (`IdRak`),
-  CONSTRAINT `tmasterbuku_ibfk_1` FOREIGN KEY (`IdKategori`) REFERENCES `tkategori` (`IdKategori`),
-  CONSTRAINT `tmasterbuku_ibfk_2` FOREIGN KEY (`IdRak`) REFERENCES `trak` (`IdRak`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  UNIQUE KEY `IdKategori_UNIQUE` (`IdKategori`),
+  UNIQUE KEY `IdRak_UNIQUE` (`IdRak`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,7 +131,7 @@ CREATE TABLE `tmasterbuku` (
 
 LOCK TABLES `tmasterbuku` WRITE;
 /*!40000 ALTER TABLE `tmasterbuku` DISABLE KEYS */;
-INSERT INTO `tmasterbuku` VALUES ('BUK001','DSADA','DAS','DASD',12,'2025-05-16 18:38:43','2025-05-16 19:16:59','KTG002','RAK002'),('BUK002','DASDA','DASD','DA',5,'2025-05-16 18:38:55','2025-05-16 18:38:55','KTG009','RAK009');
+INSERT INTO `tmasterbuku` VALUES ('BUK001','INFORMATIKA','PUTRA','PT PUTRA',12,'2025-05-30 17:49:39','2025-05-30 17:49:39','KTG001','RAK001'),('BUK002','MATEMATIKA','PUTRA','PT PUTRA',5,'2025-05-30 17:50:01','2025-05-30 17:50:01','KTG002','RAK002');
 /*!40000 ALTER TABLE `tmasterbuku` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,14 +143,15 @@ DROP TABLE IF EXISTS `tpeminjaman`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tpeminjaman` (
-  `IdPeminjaman` varchar(10) NOT NULL,
+  `IdPeminjaman` varchar(45) NOT NULL,
   `IdAnggota` varchar(10) DEFAULT NULL,
-  `TanggalPinjam` date DEFAULT NULL,
-  `TanggalJatuhTempo` date DEFAULT NULL,
-  PRIMARY KEY (`IdPeminjaman`),
-  KEY `IdAnggota` (`IdAnggota`),
-  CONSTRAINT `tpeminjaman_ibfk_1` FOREIGN KEY (`IdAnggota`) REFERENCES `tuser` (`IdUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `NamaAnggota` varchar(45) DEFAULT NULL,
+  `KodeEksemplar` varchar(45) DEFAULT NULL,
+  `NamaBuku` varchar(45) DEFAULT NULL,
+  `TanggalPinjam` datetime DEFAULT NULL,
+  `TanggalJatuhTempo` datetime DEFAULT NULL,
+  PRIMARY KEY (`IdPeminjaman`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -179,34 +160,8 @@ CREATE TABLE `tpeminjaman` (
 
 LOCK TABLES `tpeminjaman` WRITE;
 /*!40000 ALTER TABLE `tpeminjaman` DISABLE KEYS */;
+INSERT INTO `tpeminjaman` VALUES ('AGT001-BUK00111-20250530','AGT001','Budi Santoso','BUK001.11','INFORMATIKA','2025-05-30 18:24:41','2025-06-06 18:24:41'),('AGT001-BUK0018-20250530','AGT001','Budi Santoso','BUK001.8','INFORMATIKA','2025-05-30 18:17:08','2025-06-06 18:17:08'),('AGT002-BUK0019-20250530','AGT002','Ani Rahmawati','BUK001.9','INFORMATIKA','2025-05-30 18:42:37','2025-06-06 18:42:37'),('AGT002-BUK0021-20250530','AGT002','Ani Rahmawati','BUK002.1','MATEMATIKA','2025-05-30 18:52:33','2025-06-06 18:52:33'),('AGT003-BUK0015-20250530','AGT003','Citra Dewi','BUK001.5','INFORMATIKA','2025-05-30 18:11:28','2025-06-06 18:11:28'),('AGT003-BUK0023-20250530','AGT003','Citra Dewi','BUK002.3','MATEMATIKA','2025-05-30 18:17:55','2025-06-06 18:17:55');
 /*!40000 ALTER TABLE `tpeminjaman` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `tpengembalian`
---
-
-DROP TABLE IF EXISTS `tpengembalian`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tpengembalian` (
-  `IdPengembalian` varchar(10) NOT NULL,
-  `IdPeminjaman` varchar(10) DEFAULT NULL,
-  `TanggalKembali` date DEFAULT NULL,
-  `Denda` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`IdPengembalian`),
-  KEY `IdPeminjaman` (`IdPeminjaman`),
-  CONSTRAINT `tpengembalian_ibfk_1` FOREIGN KEY (`IdPeminjaman`) REFERENCES `tpeminjaman` (`IdPeminjaman`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tpengembalian`
---
-
-LOCK TABLES `tpengembalian` WRITE;
-/*!40000 ALTER TABLE `tpengembalian` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tpengembalian` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -218,12 +173,12 @@ DROP TABLE IF EXISTS `trak`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trak` (
   `IdRak` varchar(10) NOT NULL,
-  `NamaRak` varchar(100) NOT NULL,
-  `Lokasi` varchar(100) NOT NULL,
+  `NamaRak` varchar(45) DEFAULT NULL,
+  `Lokasi` varchar(100) DEFAULT NULL,
   `DateCreate` datetime DEFAULT NULL,
   `DateModify` datetime DEFAULT NULL,
   PRIMARY KEY (`IdRak`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,7 +187,7 @@ CREATE TABLE `trak` (
 
 LOCK TABLES `trak` WRITE;
 /*!40000 ALTER TABLE `trak` DISABLE KEYS */;
-INSERT INTO `trak` VALUES ('RAK002','Rak Sains','Lantai 1 - A2','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK003','Rak Sejarah','Lantai 1 - B1','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK004','Rak Fiksi','Lantai 2 - C1','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK005','Rak Bisnis','Lantai 2 - C2','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK006','Rak Kesehatan','Lantai 2 - C3','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK007','Rak Seni','Lantai 3 - D1','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK008','Rak Pendidikan','Lantai 3 - D2','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK009','Rak Agama','Lantai 3 - E1','2025-05-09 23:58:02','2025-05-09 23:58:02'),('RAK010','Rak Hukum','Lantai 3 - E2','2025-05-09 23:58:02','2025-05-09 23:58:02');
+INSERT INTO `trak` VALUES ('RAK001','Rak Teknologi','Lantai 1, Area A','2025-05-30 15:40:02','2025-05-30 15:40:02'),('RAK002','Rak Manajemen','Lantai 1, Area B','2025-05-30 15:40:02','2025-05-30 15:40:02'),('RAK003','Rak Sastra','Lantai 2, Area A','2025-05-30 15:40:02','2025-05-30 15:40:02'),('RAK004','Rak IPA','Lantai 2, Area B','2025-05-30 15:40:02','2025-05-30 15:40:02');
 /*!40000 ALTER TABLE `trak` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -245,11 +200,11 @@ DROP TABLE IF EXISTS `trole`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trole` (
   `IdRole` int(11) NOT NULL AUTO_INCREMENT,
-  `NamaRole` varchar(50) DEFAULT NULL,
+  `NamaRole` varchar(45) DEFAULT NULL,
   `DateCreate` datetime DEFAULT NULL,
   `DateModify` datetime DEFAULT NULL,
   PRIMARY KEY (`IdRole`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -258,7 +213,7 @@ CREATE TABLE `trole` (
 
 LOCK TABLES `trole` WRITE;
 /*!40000 ALTER TABLE `trole` DISABLE KEYS */;
-INSERT INTO `trole` VALUES (1,'admin','2025-05-02 19:15:10','2025-05-02 19:15:10'),(2,'mahasiswa','2025-05-02 20:39:42','2025-05-02 20:39:42');
+INSERT INTO `trole` VALUES (1,'Admin','2025-05-30 15:36:20','2025-05-30 15:36:20'),(2,'Staff','2025-05-30 15:36:20','2025-05-30 15:36:20');
 /*!40000 ALTER TABLE `trole` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -271,15 +226,13 @@ DROP TABLE IF EXISTS `tuser`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tuser` (
   `IdUser` varchar(10) NOT NULL,
-  `Username` varchar(50) DEFAULT NULL,
-  `Password` varchar(50) DEFAULT NULL,
-  `IdRole` int(11) DEFAULT NULL,
+  `Username` varchar(45) DEFAULT NULL,
+  `Password` varchar(45) DEFAULT NULL,
+  `IdRole` int(11) unsigned DEFAULT NULL,
   `DateCreate` datetime DEFAULT NULL,
   `DateModify` datetime DEFAULT NULL,
-  PRIMARY KEY (`IdUser`),
-  KEY `IdRole` (`IdRole`),
-  CONSTRAINT `tuser_ibfk_1` FOREIGN KEY (`IdRole`) REFERENCES `trole` (`IdRole`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`IdUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,7 +241,7 @@ CREATE TABLE `tuser` (
 
 LOCK TABLES `tuser` WRITE;
 /*!40000 ALTER TABLE `tuser` DISABLE KEYS */;
-INSERT INTO `tuser` VALUES ('ADM001','admin','admin',1,'2025-05-16 20:14:58','2025-05-16 20:14:58'),('PEG001','staff','staff',2,'2025-05-16 20:15:52','2025-05-16 20:15:52');
+INSERT INTO `tuser` VALUES ('ADM001','admin','admin123',1,'2025-05-30 15:36:28','2025-05-30 15:36:28'),('STF001','staff','staff123',2,'2025-05-30 15:36:28','2025-05-30 15:36:28');
 /*!40000 ALTER TABLE `tuser` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -301,4 +254,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-16 20:58:13
+-- Dump completed on 2025-06-08 21:39:38

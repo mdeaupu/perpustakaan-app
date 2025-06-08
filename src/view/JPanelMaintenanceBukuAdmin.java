@@ -4,7 +4,6 @@
  */
 package view;
 
-import java.awt.List;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +17,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import main.JFrameHome;
 import main.PanelUpdateListener;
 
 /**
@@ -27,15 +25,12 @@ import main.PanelUpdateListener;
  */
 public class JPanelMaintenanceBukuAdmin extends javax.swing.JPanel {
     private Runnable updateListener;
-    DefaultTableModel tabelmodel; 
     Connection con=null; 
     Statement stat; 
     ResultSet res; 
     PreparedStatement pst = null; 
-    String cekconeks; 
     private Map<String, String> kategoriMap = new HashMap<>();
     private Map<String, String> rakMap = new HashMap<>();
-    JPanelViewBukuAdmin view = new JPanelViewBukuAdmin();
     
     /**
      * Creates new form JPanelMaintenanceBuku
@@ -48,13 +43,11 @@ public class JPanelMaintenanceBukuAdmin extends javax.swing.JPanel {
         datatojtable();
          jComboKategori.addActionListener(e -> {
         if (jComboKategori.getSelectedItem() != null) {
-            // Update data terkait kategori jika diperlukan
         }
     });
     
     jComboRak.addActionListener(e -> {
         if (jComboRak.getSelectedItem() != null) {
-            // Update data terkait rak jika diperlukan
         }
     });
     }
@@ -75,7 +68,6 @@ public class JPanelMaintenanceBukuAdmin extends javax.swing.JPanel {
         this.comboBoxUpdateListener = listener;
     }
     
-    // Method untuk refresh combo box
      public void refreshData() {
         datatojtable();
         dataToComboBoxKategori();
@@ -108,8 +100,6 @@ public class JPanelMaintenanceBukuAdmin extends javax.swing.JPanel {
             kategoriMap.put(nama, id);
             jComboKategori.addItem(nama);
         }
-        
-        // Pertahankan seleksi sebelumnya jika ada
         if (jComboKategori.getItemCount() > 0) {
             jComboKategori.setSelectedIndex(0);
         }
@@ -141,8 +131,6 @@ public void dataToComboBoxRak() {
             rakMap.put(nama, id);
             jComboRak.addItem(nama);
         }
-        
-        // Pertahankan seleksi sebelumnya jika ada
         if (jComboRak.getItemCount() > 0) {
             jComboRak.setSelectedIndex(0);
         }
@@ -161,7 +149,6 @@ public void dataToComboBoxRak() {
     private void datatojtable() 
     { 
         DefaultTableModel tb= new DefaultTableModel(); 
-        // Memberi nama pada se�ap kolom tabel 
         tb.addColumn("Id Buku"); 
         tb.addColumn("Nama Buku"); 
         tb.addColumn("Pengarang"); 
@@ -174,12 +161,9 @@ public void dataToComboBoxRak() {
         
         jTableBuku.setModel(tb); 
         try{ 
-        // Mengambil data dari database 
          res=stat.executeQuery("select *from tmasterbuku"); 
         while (res.next()) 
         { 
-        // Mengambil data dari database berdasarkan nama kolom pada tabel 
-            // Lalu di tampilkan ke dalam JTable 
             tb.addRow(new Object[]{ 
             res.getString("IdBuku"), 
             res.getString("NamaBuku"), 
@@ -192,7 +176,7 @@ public void dataToComboBoxRak() {
             res.getString("IdRak")     
            }); 
           } 
-         Aturkolom(); //pemanggilan class untuk mengatur kolom 
+         Aturkolom();
         }catch (SQLException e){ 
         } 
            } 
@@ -262,7 +246,6 @@ public void dataToComboBoxRak() {
    }
      
     private void insEksemplar(String idBuku, int jumlah) throws SQLException {
-    // Cari nomor terakhir untuk IdBuku ini
     String findLastNumQuery = "SELECT MAX(IdEksemplar) as last_num FROM teksemplar WHERE IdBuku = ?";
     int startNumber = 1;
     
@@ -275,9 +258,8 @@ public void dataToComboBoxRak() {
         }
     }
 
-    // Insert data baru
-    String insertQuery = "INSERT INTO teksemplar (IdEksemplar, IdBuku, KodeEksemplar, DateCreate, DateModify) " +
-                       "VALUES (?, ?, ?, NOW(), NOW())";
+    String insertQuery = "INSERT INTO teksemplar (IdEksemplar, IdBuku, KodeEksemplar, DateCreate, DateModify, Status) " +
+                       "VALUES (?, ?, ?, NOW(), NOW(), true)";
     
     try (PreparedStatement stmt = con.prepareStatement(insertQuery)) {
         for (int i = 0; i < jumlah; i++) {
@@ -307,15 +289,13 @@ public void dataToComboBoxRak() {
         "SELECT MAX(CAST(SUBSTRING_INDEX(KodeEksemplar, '.', -1) AS UNSIGNED)) as last_num " +
         "FROM teksemplar WHERE IdBuku='" + idBuku + "'");
     
-    int startNumber = 1; // Default jika belum ada eksemplar
+    int startNumber = 1;
     if (res.next() && res.getObject("last_num") != null) {
         startNumber = res.getInt("last_num");
     }
     findStmt.close();
     
     if (response == JOptionPane.YES_OPTION) {
-        // Tambah stok
-        // Dapatkan jumlah saat ini
             Statement getStmt = con.createStatement();
             ResultSet rs = getStmt.executeQuery("SELECT Jumlah FROM tmasterbuku WHERE IdBuku='" + idBuku + "'");
             
@@ -327,10 +307,7 @@ public void dataToComboBoxRak() {
             
             int currentJumlah = rs.getInt("Jumlah");
         try {
-            // Tambahkan eksemplar baru
             insEksemplar(idBuku, xjml);
-            
-            // Update jumlah di tmasterbuku
             Statement updateStmt = con.createStatement();
             updateStmt.executeUpdate("UPDATE tmasterbuku SET " +
                                    "Jumlah = " + (currentJumlah + xjml) + ", " +
@@ -346,17 +323,13 @@ public void dataToComboBoxRak() {
             e.printStackTrace();
         }
     } else if (response == JOptionPane.NO_OPTION) {
-        // Ubah stok
         try {
-            // Hapus semua eksemplar lama
             Statement delStmt = con.createStatement();
             delStmt.executeUpdate("DELETE FROM teksemplar WHERE IdBuku='" + idBuku + "'");
             delStmt.close();
-            
-            // Tambahkan eksemplar baru
+
             insEksemplar(idBuku, xjml);
-            
-            // Update jumlah di tmasterbuku
+
             Statement updateStmt = con.createStatement();
             updateStmt.executeUpdate("UPDATE tmasterbuku SET " +
                 "NamaBuku='" + jTextNamaBuku.getText() + "', " +

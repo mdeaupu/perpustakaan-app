@@ -4,9 +4,7 @@
  */
 package main;
 
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JFrame;
 import main.JFrameRoleUser;
 import main.JFrameMaintenanceUser;
 import view.JPanelMaintenanceBukuAdmin;
@@ -27,17 +25,32 @@ public class JFrameHome extends javax.swing.JFrame {
     private String loggedInRole;
     private PanelUpdateListener updateListener;
     JPanelMaintenanceBukuAdmin MBA = new JPanelMaintenanceBukuAdmin();
-        JPanelViewBukuAdmin V = new JPanelViewBukuAdmin();
-        JPanelMaintenanceKategoriAdmin K = new JPanelMaintenanceKategoriAdmin();
-        JPanelMaintenanceRakAdmin R = new JPanelMaintenanceRakAdmin();
-        JPanelViewPeminjamanAdmin VPA = new JPanelViewPeminjamanAdmin();
-        JPanelPeminjamanUser PU = new JPanelPeminjamanUser();
-        JPanelPengembalianUser PUU = new JPanelPengembalianUser();
+    JPanelViewBukuAdmin V = new JPanelViewBukuAdmin();
+    JPanelMaintenanceKategoriAdmin K = new JPanelMaintenanceKategoriAdmin();
+    JPanelMaintenanceRakAdmin R = new JPanelMaintenanceRakAdmin();
+    JPanelViewPeminjamanAdmin VPA = new JPanelViewPeminjamanAdmin();
+    JPanelPeminjamanUser PU = new JPanelPeminjamanUser();
+    JPanelPengembalianUser PUU = new JPanelPengembalianUser();
+    
     /**
      * Creates new form JFrameHome
      */
+    
     public JFrameHome() {
         initComponents();
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Tambahkan ini
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                kembaliKeLogin();
+            }
+        });
+    }
+    
+    private void kembaliKeLogin() {
+        JFrameLogin login = new JFrameLogin();
+        login.setVisible(true);
+        this.dispose(); // Tutup frame home
     }
     
     public void setUpdateListener(PanelUpdateListener listener) {
@@ -55,26 +68,21 @@ public class JFrameHome extends javax.swing.JFrame {
     if (loggedInRole != null && loggedInRole.equals("1")) {
         MRole.setVisible(true);
         MUser.setVisible(true);
+        MAnggota.setVisible(false);
         jTabbedPane.setVisible(true);
         jTabbedPane.addTab("Maintenance Buku", MBA);
         jTabbedPane.addTab("View Buku", V);
         jTabbedPane.addTab("Maintenance Kategori", K);
         jTabbedPane.addTab("Maintenance Rak", R);
-        jTabbedPane.addTab("View Peminjaman", VPA);
-         MBA.setUpdateListener(() -> notifyPanels("MAINTENANCE_BUKU"));
-            
-            // Set listener khusus untuk update combo box
+        MBA.setUpdateListener(() -> notifyPanels("MAINTENANCE_BUKU"));
             K.setUpdateListener(() -> {
                 notifyPanels("MAINTENANCE_KATEGORI");
-                MBA.refreshData(); // Refresh data tabel
+                MBA.refreshData();
             });
-
             R.setUpdateListener(() -> {
                 notifyPanels("MAINTENANCE_RAK");
-                MBA.refreshData(); // Refresh data tabel
+                MBA.refreshData();
             });
-
-            // Set listener untuk update combo box dari panel lain
             MBA.setComboBoxUpdateListener(panelName -> {
                 if ("MAINTENANCE_KATEGORI".equals(panelName)) {
                     MBA.dataToComboBoxKategori();
@@ -83,15 +91,25 @@ public class JFrameHome extends javax.swing.JFrame {
                 }
             });
     } else {
+        PU.setUpdateListener(() -> {
+            VPA.refreshData();
+        });
+        PUU.setUpdateListener(() -> {
+            PU.refreshData();
+            VPA.refreshData();
+        });
         MRole.setVisible(false);
         MUser.setVisible(false);
+        MAnggota.setVisible(true);
         jTabbedPane.setVisible(true);
         jTabbedPane.addTab("Peminjaman Buku", PU);
         jTabbedPane.addTab("Pengembalian Buku", PUU);
+        jTabbedPane.addTab("View Peminjaman", VPA);
     }
     revalidate();
     repaint();
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -107,6 +125,7 @@ public class JFrameHome extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         MRole = new javax.swing.JMenuItem();
         MUser = new javax.swing.JMenuItem();
+        MAnggota = new javax.swing.JMenuItem();
         MKeluar = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
@@ -139,6 +158,14 @@ public class JFrameHome extends javax.swing.JFrame {
         });
         jMenu1.add(MUser);
 
+        MAnggota.setText("Maintenance Anggota");
+        MAnggota.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MAnggotaActionPerformed(evt);
+            }
+        });
+        jMenu1.add(MAnggota);
+
         MKeluar.setText("Keluar");
         MKeluar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,7 +186,7 @@ public class JFrameHome extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(51, Short.MAX_VALUE)
+                .addContainerGap(45, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(55, 55, 55)
                 .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -204,6 +231,13 @@ public class JFrameHome extends javax.swing.JFrame {
         V.bersihkan();
     }//GEN-LAST:event_jTabbedPaneMouseClicked
 
+    private void MAnggotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MAnggotaActionPerformed
+        // TODO add your handling code here:
+        JFrameMaintenanceAnggota role = new JFrameMaintenanceAnggota();
+        role.setLocationRelativeTo(null); 
+        role.setVisible(true);
+    }//GEN-LAST:event_MAnggotaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -240,6 +274,7 @@ public class JFrameHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem MAnggota;
     private javax.swing.JMenuItem MKeluar;
     private javax.swing.JMenuItem MRole;
     private javax.swing.JMenuItem MUser;

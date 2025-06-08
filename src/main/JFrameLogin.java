@@ -20,11 +20,10 @@ public class JFrameLogin extends javax.swing.JFrame {
     Statement stm,stat;
     ResultSet rs;
     
-
-
     /**
      * Creates new form JFrameLogin
      */
+    
     public JFrameLogin() {
         initComponents();
         koneksi();
@@ -58,9 +57,6 @@ public class JFrameLogin extends javax.swing.JFrame {
         }
     }
     
-    
-    
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -77,10 +73,9 @@ public class JFrameLogin extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jText_password = new javax.swing.JTextField();
         jButton_login = new javax.swing.JButton();
-        jButton_keluar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
+        setPreferredSize(new java.awt.Dimension(500, 600));
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/books (2).png"))); // NOI18N
@@ -92,17 +87,12 @@ public class JFrameLogin extends javax.swing.JFrame {
 
         jLabel4.setText("Password");
 
+        jButton_login.setBackground(new java.awt.Color(0, 102, 255));
+        jButton_login.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton_login.setText("LOGIN");
         jButton_login.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_loginActionPerformed(evt);
-            }
-        });
-
-        jButton_keluar.setText("KELUAR");
-        jButton_keluar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_keluarActionPerformed(evt);
             }
         });
 
@@ -111,20 +101,20 @@ public class JFrameLogin extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(75, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addContainerGap(72, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton_login, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(150, 150, 150)
-                        .addComponent(jButton_keluar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jText_username)
-                        .addComponent(jText_password, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(75, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jText_username)
+                            .addComponent(jText_password, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(78, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -132,10 +122,10 @@ public class JFrameLogin extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(98, Short.MAX_VALUE)
+                .addContainerGap(71, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -145,10 +135,8 @@ public class JFrameLogin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jText_password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton_login)
-                    .addComponent(jButton_keluar))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addComponent(jButton_login, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(78, Short.MAX_VALUE))
         );
 
         pack();
@@ -171,17 +159,16 @@ public class JFrameLogin extends javax.swing.JFrame {
                     String role = rs.getString("IdRole");
                     JFrameHome menu = new JFrameHome();
                      menu.setUpdateListener(panelName -> {
-            if ("MAINTENANCE_BUKU".equals(panelName) || 
-                "MAINTENANCE_KATEGORI".equals(panelName) || 
-                "MAINTENANCE_RAK".equals(panelName)) {
-                // Jika ada update dari maintenance, refresh view buku
-                menu.V.onPanelUpdate(panelName);
-            }
-        });
-                    menu.setRole(role);
-                    menu.setLocationRelativeTo(null);
-                    menu.setVisible(true);
-                    dispose();
+                         if ("MAINTENANCE_BUKU".equals(panelName) || 
+                                 "MAINTENANCE_KATEGORI".equals(panelName) || 
+                                 "MAINTENANCE_RAK".equals(panelName)) {
+                             menu.V.onPanelUpdate(panelName);
+                         }
+                     });
+                     menu.setRole(role);
+                     menu.setLocationRelativeTo(null);
+                     menu.setVisible(true);
+                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "User atau pass ada yang salah");
                     jText_username.requestFocus();
@@ -191,11 +178,6 @@ public class JFrameLogin extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButton_loginActionPerformed
-
-    private void jButton_keluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_keluarActionPerformed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_jButton_keluarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -233,7 +215,6 @@ public class JFrameLogin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton_keluar;
     private javax.swing.JButton jButton_login;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

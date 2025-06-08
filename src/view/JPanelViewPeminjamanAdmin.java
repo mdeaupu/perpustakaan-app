@@ -19,7 +19,7 @@ import javax.swing.table.TableColumn;
  * @author Hp
  */
 public class JPanelViewPeminjamanAdmin extends javax.swing.JPanel {
-
+private Runnable updateListener;
     DefaultTableModel tabelmodel; 
     Connection con=null; 
     Statement stat; 
@@ -34,6 +34,21 @@ public class JPanelViewPeminjamanAdmin extends javax.swing.JPanel {
         initComponents();
         koneksi();
         datatojtable();
+    }
+    
+        public void setUpdateListener(Runnable listener) {
+    this.updateListener = listener;
+}
+
+private void triggerUpdate() {
+    if (updateListener != null) {
+        updateListener.run();
+    }
+}
+
+public void refreshData() {
+        datatojtable();
+
     }
     
      private void koneksi(){ 
@@ -58,12 +73,14 @@ DefaultTableModel tb= new DefaultTableModel();
 tb.addColumn("Id Peminjaman"); 
 tb.addColumn("Id Anggota"); 
 tb.addColumn("Nama Anggota"); 
+tb.addColumn("Kode Eksemplar"); 
+tb.addColumn("Nama Buku"); 
 tb.addColumn("Tanggal Pinjam"); 
 tb.addColumn("Tanggal Jatuh Tempo");   
 jTablePeminjaman.setModel(tb); 
 try{ 
 // Mengambil data dari database
-  res=stat.executeQuery("SELECT p.IdPeminjaman,a.IdAnggota,a.NamaAnggota,p.TanggalPinjam,p.TanggalJatuhTempo FROM tpeminjaman p JOIN tanggota a ON p.IdAnggota = a.IdAnggota ORDER BY p.TanggalPinjam DESC;"); 
+  res=stat.executeQuery("select * from tpeminjaman"); 
         
  
         while (res.next()) 
@@ -74,8 +91,10 @@ try{
             res.getString("IdPeminjaman"), 
             res.getString("IdAnggota"), 
             res.getString("NamaAnggota"), 
-            res.getString("TanggalPinjam"), 
-            res.getString("TanggalJatuhTempo"), 
+            res.getString("KodeEksemplar"), 
+            res.getString("NamaBuku"), 
+            res.getTimestamp("TanggalPinjam"), 
+            res.getTimestamp("TanggalJatuhTempo"), 
            }); 
           } 
          Aturkolom(); //pemanggilan class untuk mengatur kolom 

@@ -104,11 +104,12 @@ tb.addColumn("Date Modify");
 tb.addColumn("Id Kategori"); 
 tb.addColumn("Id Rak"); 
 tb.addColumn("Id Eksemplar"); 
-tb.addColumn("Kode Eksemplar"); 
+tb.addColumn("Kode Eksemplar");
+tb.addColumn("Status");
 jTableBukuView.setModel(tb); 
 try{ 
 // Mengambil data dari database
-  res=stat.executeQuery("SELECT b.IdEksemplar,b.KodeEksemplar,a.*,c.IdKategori,d.IdRak FROM tmasterbuku a JOIN teksemplar b ON a.IdBuku = b.IdBuku JOIN tkategori c ON a.IdKategori = c.IdKategori JOIN trak d ON a.IdRak = d.IdRak GROUP BY b.IdEksemplar, b.KodeEksemplar ORDER BY SUBSTRING_INDEX(b.KodeEksemplar, '.', 1), CAST(SUBSTRING_INDEX(b.KodeEksemplar, '.', -1) AS UNSIGNED), b.IdEksemplar;"); 
+  res=stat.executeQuery("SELECT b.IdEksemplar,b.KodeEksemplar,b.Status,a.*,c.IdKategori,d.IdRak FROM tmasterbuku a JOIN teksemplar b ON a.IdBuku = b.IdBuku JOIN tkategori c ON a.IdKategori = c.IdKategori JOIN trak d ON a.IdRak = d.IdRak GROUP BY b.IdEksemplar, b.KodeEksemplar ORDER BY SUBSTRING_INDEX(b.KodeEksemplar, '.', 1), CAST(SUBSTRING_INDEX(b.KodeEksemplar, '.', -1) AS UNSIGNED), b.IdEksemplar;"); 
         
  
         while (res.next()) 
@@ -126,7 +127,8 @@ try{
             res.getString("IdKategori"), 
             res.getString("IdRak"),
             res.getString("IdEksemplar"), 
-            res.getString("KodeEksemplar")
+            res.getString("KodeEksemplar"),
+            res.getString("Status")
            }); 
           } 
          Aturkolom(); //pemanggilan class untuk mengatur kolom 
